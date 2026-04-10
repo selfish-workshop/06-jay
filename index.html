@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>퇴근을 향하여 — 오늘의 용사를 소환하세요</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Jua&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1A1B3A;
+  --accent-hero: #F5C518;
+  --accent-boss: #8B5CF6;
+  --success: #4ADE80;
+  --warning: #EF4444;
+  --neutral-100: #E5E7EB;
+  --neutral-400: #6B7280;
+  --bg-card: #252654;
+  --bg-card-hover: #2D2E63;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Jua', 'Press Start 2P', sans-serif;
+  background: linear-gradient(135deg, #0F0F2E 0%, #1A1B3A 100%);
+  color: var(--neutral-100);
+  min-height: 100vh;
+  overflow-x: hidden;
+  letter-spacing: 0.02em;
+}
+
+.pixel { font-family: 'Press Start 2P', monospace; }
+.rpg-title { font-family: 'Black Han Sans', 'Jua', sans-serif; letter-spacing: 0.04em; }
+.rpg-script { font-family: 'Gugi', 'Jua', sans-serif; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+.screen { display: none; min-height: 100vh; padding: 24px; }
+.screen.active { display: block; }
+
+/* === Header === */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 2px solid var(--bg-card);
+  margin: -24px -24px 32px -24px;
+}
+.header-title { font-size: 20px; font-family: 'Jua', sans-serif; letter-spacing: 0.02em; }
+.header-title.hero { color: var(--accent-hero); }
+.header-title.boss { color: var(--accent-boss); }
+.header-actions { display: flex; gap: 12px; }
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--neutral-400);
+  color: var(--neutral-100);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: var(--accent-hero); color: var(--accent-hero); }
+
+/* === S1: Mode Select === */
+#screen-mode {
+  display: none;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+#screen-mode.active { display: flex; }
+
+.mode-title {
+  font-size: 64px;
+  color: var(--accent-hero);
+  margin-bottom: 12px;
+  font-family: 'Jua', sans-serif;
+  text-align: center;
+  text-shadow: 0 0 40px rgba(245, 197, 24, 0.35);
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+.mode-subtitle {
+  font-size: 18px;
+  color: var(--neutral-400);
+  margin-bottom: 60px;
+  font-family: 'Jua', sans-serif;
+}
+.mode-cards { display: flex; gap: 48px; flex-wrap: wrap; justify-content: center; }
+.mode-card {
+  width: 280px;
+  height: 360px;
+  background: var(--bg-card);
+  border: 2px solid var(--bg-card);
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  transition: all 0.3s;
+  position: relative;
+}
+.mode-card:hover { transform: scale(1.03); background: var(--bg-card-hover); }
+.mode-card.hero:hover { border-color: var(--accent-hero); box-shadow: 0 0 40px rgba(245, 197, 24, 0.3); }
+.mode-card.boss:hover { border-color: var(--accent-boss); box-shadow: 0 0 40px rgba(139, 92, 246, 0.3); }
+.mode-card.pulse.hero { animation: pulse-hero 2s ease-in-out infinite; }
+@keyframes pulse-hero {
+  0%, 100% { box-shadow: 0 0 0 rgba(245, 197, 24, 0); }
+  50% { box-shadow: 0 0 30px rgba(245, 197, 24, 0.4); }
+}
+.mode-icon { font-size: 72px; margin-bottom: 24px; }
+.mode-name {
+  font-size: 30px;
+  font-family: 'Jua', sans-serif;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+}
+.mode-name.hero { color: var(--accent-hero); }
+.mode-name.boss { color: var(--accent-boss); }
+.mode-label { font-size: 11px; color: var(--neutral-400); margin-bottom: 20px; font-family: 'Press Start 2P', monospace; }
+.mode-desc { font-size: 15px; color: var(--neutral-100); text-align: center; line-height: 1.7; font-family: 'Jua', sans-serif; }
+
+/* === S2: Character (Task Input) === */
+#screen-create .container { max-width: 680px; margin: 0 auto; }
+.create-title {
+  font-size: 38px;
+  color: var(--accent-hero);
+  margin-bottom: 8px;
+  text-align: center;
+  font-family: 'Jua', sans-serif;
+  letter-spacing: 0.02em;
+}
+.create-subtitle {
+  font-size: 16px;
+  color: var(--neutral-400);
+  text-align: center;
+  margin-bottom: 32px;
+  font-family: 'Jua', sans-serif;
+}
+.class-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.class-card {
+  background: var(--bg-card);
+  border: 2px solid var(--bg-card);
+  border-radius: 12px;
+  padding: 20px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.class-card:hover { background: var(--bg-card-hover); border-color: var(--neutral-400); }
+.class-card.selected { border-color: var(--accent-hero); box-shadow: 0 0 20px rgba(245, 197, 24, 0.25); background: var(--bg-card-hover); }
+.class-icon { font-size: 40px; margin-bottom: 8px; }
+.class-name { font-family: 'Jua', sans-serif; font-size: 20px; color: var(--accent-hero); letter-spacing: 0; margin-bottom: 4px; }
+.class-job { font-size: 12px; color: var(--neutral-400); font-family: 'Jua', sans-serif; }
+.class-picker-label {
+  font-family: 'Jua', sans-serif;
+  font-size: 18px;
+  color: var(--neutral-100);
+  margin-bottom: 12px;
+  letter-spacing: 0;
+}
+.class-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 4px 12px;
+  background: rgba(245, 197, 24, 0.15);
+  border: 1px solid var(--accent-hero);
+  border-radius: 20px;
+  font-family: 'Jua', sans-serif;
+  font-size: 14px;
+  color: var(--accent-hero);
+  letter-spacing: 0;
+}
+.quest-inputs { display: flex; flex-direction: column; gap: 16px; }
+.quest-input-card {
+  background: var(--bg-card);
+  border: 2px solid var(--bg-card);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+}
+.quest-input-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.quest-input-label { font-size: 16px; color: var(--accent-hero); font-family: 'Jua', sans-serif; letter-spacing: 0; }
+.btn-remove {
+  background: transparent;
+  border: none;
+  color: var(--warning);
+  cursor: pointer;
+  font-size: 18px;
+}
+.field { margin-bottom: 12px; }
+.field label {
+  display: block;
+  font-size: 12px;
+  color: var(--neutral-400);
+  margin-bottom: 4px;
+}
+.field input, .field select {
+  width: 100%;
+  background: var(--primary);
+  border: 1px solid var(--neutral-400);
+  color: var(--neutral-100);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+}
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent-hero); }
+.field-row { display: flex; gap: 12px; }
+.field-row .field { flex: 1; }
+.btn-add {
+  background: transparent;
+  border: 2px dashed var(--neutral-400);
+  color: var(--neutral-400);
+  padding: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  width: 100%;
+  margin-top: 12px;
+  transition: all 0.2s;
+}
+.btn-add:hover { border-color: var(--accent-hero); color: var(--accent-hero); }
+.btn-primary {
+  background: var(--accent-hero);
+  color: var(--primary);
+  border: none;
+  padding: 18px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 22px;
+  width: 100%;
+  margin-top: 24px;
+  font-family: 'Jua', sans-serif;
+  letter-spacing: 0.02em;
+  transition: all 0.2s;
+}
+.btn-primary:disabled { background: var(--neutral-400); cursor: not-allowed; }
+.btn-primary:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 197, 24, 0.4); }
+
+/* === S3: Opening === */
+#screen-opening {
+  display: none;
+  min-height: 100vh;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+#screen-opening.active { display: block; }
+.opening-skip {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  backdrop-filter: blur(10px);
+}
+.opening-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 700px;
+  text-align: center;
+  color: white;
+  font-family: 'Jua', sans-serif;
+  font-size: 30px;
+  line-height: 2.2;
+  letter-spacing: 0.02em;
+  bottom: -100%;
+  animation: creditScroll 8s linear forwards;
+}
+.opening-text p { margin-bottom: 32px; }
+.opening-text .highlight { color: var(--accent-hero); font-size: 56px; font-family: 'Jua', sans-serif; text-shadow: 0 0 24px rgba(245,197,24,0.5); }
+@keyframes creditScroll {
+  from { bottom: -100%; }
+  to { bottom: 120%; }
+}
+
+/* === S4: Quest Main === */
+#screen-quest .container { max-width: 1200px; margin: 0 auto; }
+.quest-summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  padding: 20px 24px;
+  border-radius: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.quest-summary-item { display: flex; align-items: center; gap: 8px; }
+.quest-summary-label { font-size: 12px; color: var(--neutral-400); }
+.quest-summary-value { font-size: 20px; font-weight: 700; color: var(--accent-hero); font-family: 'JetBrains Mono', monospace; }
+.quest-summary-divider { width: 1px; height: 24px; background: var(--neutral-400); }
+
+.quest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.quest-card {
+  background: var(--bg-card);
+  border: 2px solid var(--bg-card);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+.quest-card:hover { transform: translateY(-4px); background: var(--bg-card-hover); }
+.quest-card.stuck { border-color: var(--warning); }
+.quest-card.clear { border-color: var(--success); }
+.quest-card.clear::after {
+  content: '✓ 클리어';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--success);
+  color: var(--primary);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.quest-type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-family: 'Jua', sans-serif;
+  letter-spacing: 0;
+  margin-bottom: 12px;
+}
+.quest-type-badge.main { background: var(--accent-hero); color: var(--primary); }
+.quest-type-badge.sub { background: var(--neutral-400); color: var(--primary); }
+.quest-type-badge.boss { background: var(--warning); color: white; }
+.quest-type-badge.daily { background: #3B82F6; color: white; }
+.quest-name {
+  font-size: 19px;
+  font-family: 'Jua', sans-serif;
+  letter-spacing: 0;
+  margin-bottom: 10px;
+  color: var(--neutral-100);
+  line-height: 1.4;
+}
+.quest-difficulty { font-size: 14px; color: var(--accent-hero); margin-bottom: 12px; }
+.progress-bar {
+  background: rgba(0,0,0,0.3);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-hero), var(--success));
+  transition: width 0.4s ease-out;
+}
+.quest-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--neutral-400);
+}
+.stuck-badge {
+  display: inline-block;
+  background: var(--warning);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+.empty-clockout-zone {
+  text-align: center;
+  padding: 48px 24px;
+  margin: 24px 0;
+  background: linear-gradient(135deg, rgba(245,197,24,0.08), rgba(74,222,128,0.08));
+  border: 2px dashed var(--accent-hero);
+  border-radius: 16px;
+}
+.empty-title {
+  font-family: 'Jua', sans-serif;
+  font-size: 26px;
+  color: var(--accent-hero);
+  margin-bottom: 12px;
+  letter-spacing: 0;
+}
+.empty-sub {
+  font-family: 'Jua', sans-serif;
+  font-size: 16px;
+  color: var(--neutral-100);
+  margin-bottom: 28px;
+}
+.mash-btn {
+  background: linear-gradient(135deg, var(--accent-hero), #FFB800);
+  color: var(--primary);
+  border: none;
+  padding: 24px 52px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: 'Jua', sans-serif;
+  font-size: 30px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 8px 24px rgba(245, 197, 24, 0.4), 0 4px 0 #B8860B;
+  transition: transform 0.1s, box-shadow 0.1s;
+  user-select: none;
+}
+.mash-btn:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 4px 12px rgba(245, 197, 24, 0.3), 0 1px 0 #B8860B;
+}
+.mash-counter {
+  margin-top: 20px;
+  font-family: 'Jua', sans-serif;
+  font-size: 14px;
+  color: var(--neutral-400);
+}
+.clockout-section {
+  text-align: center;
+  margin-top: 32px;
+  padding: 24px;
+  border-top: 1px dashed var(--neutral-400);
+}
+.btn-clockout {
+  background: transparent;
+  border: 2px solid var(--accent-hero);
+  color: var(--accent-hero);
+  padding: 14px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Jua', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  transition: all 0.2s;
+}
+.btn-clockout:hover { background: var(--accent-hero); color: var(--primary); }
+
+/* === S5: Boss Dashboard === */
+#screen-boss .container { max-width: 1200px; margin: 0 auto; }
+.boss-intro {
+  background: rgba(139, 92, 246, 0.08);
+  border-left: 4px solid var(--accent-boss);
+  border-radius: 8px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+}
+.boss-intro-title {
+  font-family: 'Jua', sans-serif;
+  font-size: 19px;
+  color: var(--accent-boss);
+  margin-bottom: 6px;
+}
+.boss-intro-sub {
+  font-family: 'Jua', sans-serif;
+  font-size: 14px;
+  color: var(--neutral-100);
+  line-height: 1.6;
+  opacity: 0.85;
+}
+.boss-summary {
+  background: linear-gradient(135deg, var(--bg-card), #2A2A5C);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  border: 1px solid var(--accent-boss);
+}
+.boss-summary-item { display: flex; flex-direction: column; gap: 4px; }
+.boss-summary-label { font-size: 12px; color: var(--neutral-400); }
+.boss-summary-value { font-size: 24px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.boss-summary-value.stuck { color: var(--warning); }
+.boss-summary-value.done { color: var(--success); }
+.boss-summary-value.total { color: var(--accent-boss); }
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.team-card {
+  background: var(--bg-card);
+  border: 2px solid var(--bg-card);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+.team-card:hover { transform: translateY(-4px); background: var(--bg-card-hover); }
+.team-card.stuck { border-color: var(--warning); }
+.team-card.self { border-color: var(--accent-hero); box-shadow: 0 0 24px rgba(245, 197, 24, 0.2); }
+.team-card.self::before {
+  content: '나';
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  background: var(--accent-hero);
+  color: var(--primary);
+  padding: 2px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.team-name { font-size: 22px; font-family: 'Jua', sans-serif; letter-spacing: 0; margin-bottom: 4px; }
+.team-role { font-size: 13px; color: var(--neutral-400); margin-bottom: 16px; font-family: 'Jua', sans-serif; }
+.team-quest-preview { font-size: 15px; color: var(--neutral-100); margin-bottom: 12px; font-family: 'Jua', sans-serif; }
+.team-stuck-badge {
+  display: inline-block;
+  background: var(--warning);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 8px;
+  animation: pulse-red 1.5s ease-in-out infinite;
+}
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* === Modal === */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.modal-backdrop.active { display: flex; }
+.modal {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalIn 0.3s ease-out;
+}
+.modal.wide { max-width: 560px; }
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.modal-title { font-size: 22px; font-family: 'Jua', sans-serif; letter-spacing: 0; color: var(--accent-hero); }
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--neutral-400);
+  font-size: 24px;
+  cursor: pointer;
+}
+.modal-body { margin-bottom: 24px; }
+.progress-options {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.progress-opt {
+  flex: 1;
+  min-width: 60px;
+  background: var(--primary);
+  border: 1px solid var(--neutral-400);
+  color: var(--neutral-100);
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.2s;
+}
+.progress-opt.selected {
+  background: var(--accent-hero);
+  color: var(--primary);
+  border-color: var(--accent-hero);
+}
+.checkbox-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.checkbox-row input { width: 18px; height: 18px; }
+textarea {
+  width: 100%;
+  background: var(--primary);
+  border: 1px solid var(--neutral-400);
+  color: var(--neutral-100);
+  padding: 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.team-quest-list { display: flex; flex-direction: column; gap: 12px; }
+.team-quest-item {
+  background: var(--primary);
+  padding: 12px 16px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+.team-quest-item.stuck { border-left: 3px solid var(--warning); }
+
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--success);
+  color: var(--primary);
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  z-index: 200;
+  animation: toastIn 0.4s ease-out;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+@keyframes toastIn {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .mode-cards { flex-direction: column; }
+  .mode-title { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<!-- S1: Mode Selection -->
+<div id="screen-mode" class="screen active">
+  <h1 class="mode-title">퇴근을 향하여</h1>
+  <p class="mode-subtitle">오늘의 당신은 누구입니까?</p>
+  <div class="mode-cards">
+    <div class="mode-card hero pulse" onclick="selectMode('hero')">
+      <div class="mode-icon">🗡️</div>
+      <div class="mode-name hero">용사 모드</div>
+      <div class="mode-label">MEMBER</div>
+      <div class="mode-desc">오늘의 퀘스트를<br>수행하세요</div>
+    </div>
+    <div class="mode-card boss" onclick="selectMode('boss')">
+      <div class="mode-icon">👑</div>
+      <div class="mode-name boss">보스 모드</div>
+      <div class="mode-label">LEADER</div>
+      <div class="mode-desc">팀원의 오늘을<br>응원하세요</div>
+    </div>
+  </div>
+</div>
+
+<!-- S2: Character Creation -->
+<div id="screen-create" class="screen">
+  <div class="header">
+    <div class="header-title hero">🗡️ 용사 모드</div>
+    <div class="header-actions">
+      <button class="btn-ghost" onclick="goToMode()">모드 변경</button>
+    </div>
+  </div>
+  <div class="container">
+    <h2 class="create-title">오늘의 용사를 소환하세요</h2>
+    <p class="create-subtitle">처리해야 할 일을 퀘스트로 등록해주세요</p>
+    <div class="class-picker-label">① 나의 클래스를 선택해주세요</div>
+    <div class="class-picker">
+      <div class="class-card" data-class="mage" onclick="selectClass('mage')">
+        <div class="class-icon">🧙</div>
+        <div class="class-name">마법사</div>
+        <div class="class-job">개발자</div>
+      </div>
+      <div class="class-card" data-class="warrior" onclick="selectClass('warrior')">
+        <div class="class-icon">⚔️</div>
+        <div class="class-name">전사</div>
+        <div class="class-job">영업직</div>
+      </div>
+      <div class="class-card" data-class="strategist" onclick="selectClass('strategist')">
+        <div class="class-icon">🎯</div>
+        <div class="class-name">전략가</div>
+        <div class="class-job">기획팀</div>
+      </div>
+    </div>
+    <div class="class-picker-label">② 오늘 수행할 퀘스트를 등록하세요</div>
+    <div id="quest-inputs" class="quest-inputs"></div>
+    <button class="btn-add" onclick="addQuestInput()">+ 퀘스트 추가</button>
+    <button id="btn-summon" class="btn-primary" onclick="summon()" disabled>소환하기</button>
+  </div>
+</div>
+
+<!-- S3: Opening -->
+<div id="screen-opening" class="screen">
+  <button class="opening-skip" onclick="skipOpening()">Skip &gt;</button>
+  <div class="opening-text">
+    <p>202X년, 사무실이라는 던전에서</p>
+    <p>용사들은 오늘도 퀘스트를 받았습니다</p>
+    <p>그들의 진짜 목표는 단 하나 —</p>
+    <p class="highlight">퇴근</p>
+    <p>당신의 전장이 시작됩니다</p>
+  </div>
+</div>
+
+<!-- S4: Quest Main (Hero) -->
+<div id="screen-quest" class="screen">
+  <div class="header">
+    <div class="header-title hero">🗡️ 용사 모드 <span id="hero-class-badge" class="class-badge"></span></div>
+    <div class="header-actions">
+      <button class="btn-ghost" onclick="resetDemo()">초기화</button>
+      <button class="btn-ghost" onclick="goToMode()">모드 변경</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="quest-summary">
+      <div class="quest-summary-item">
+        <span class="quest-summary-label">전체</span>
+        <span id="summary-total" class="quest-summary-value">0</span>
+      </div>
+      <div class="quest-summary-divider"></div>
+      <div class="quest-summary-item">
+        <span class="quest-summary-label">완료</span>
+        <span id="summary-done" class="quest-summary-value" style="color:var(--success)">0</span>
+      </div>
+      <div class="quest-summary-divider"></div>
+      <div class="quest-summary-item">
+        <span class="quest-summary-label">진행중</span>
+        <span id="summary-progress" class="quest-summary-value">0</span>
+      </div>
+      <div class="quest-summary-divider"></div>
+      <div class="quest-summary-item">
+        <span class="quest-summary-label">막힘</span>
+        <span id="summary-stuck" class="quest-summary-value" style="color:var(--warning)">0</span>
+      </div>
+    </div>
+    <div id="quest-grid" class="quest-grid"></div>
+    <div class="clockout-section">
+      <button class="btn-clockout" onclick="clockOut()">🚪 조기 퇴근하기</button>
+      <p style="color:var(--neutral-400); font-size:12px; margin-top:12px;">모든 퀘스트 100% 완료 시 자동 퇴근됩니다</p>
+    </div>
+  </div>
+</div>
+
+<!-- S5: Boss Dashboard -->
+<div id="screen-boss" class="screen">
+  <div class="header">
+    <div class="header-title boss">👑 보스 모드</div>
+    <div class="header-actions">
+      <button class="btn-ghost" onclick="resetDemo()">초기화</button>
+      <button class="btn-ghost" onclick="goToMode()">모드 변경</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="boss-intro">
+      <div class="boss-intro-title">팀원을 응원할 준비가 되셨나요?</div>
+      <div class="boss-intro-sub">막힌 팀원이 있다면 조용히 찾아가 도와주세요. 여기는 감시판이 아니라 지원용 대시보드입니다.</div>
+    </div>
+    <div class="boss-summary">
+      <div class="boss-summary-item">
+        <span class="boss-summary-label">팀 전체 퀘스트</span>
+        <span id="boss-total" class="boss-summary-value total">0</span>
+      </div>
+      <div class="boss-summary-item">
+        <span class="boss-summary-label">완료</span>
+        <span id="boss-done" class="boss-summary-value done">0</span>
+      </div>
+      <div class="boss-summary-item">
+        <span class="boss-summary-label">진행중</span>
+        <span id="boss-progress" class="boss-summary-value">0</span>
+      </div>
+      <div class="boss-summary-item">
+        <span class="boss-summary-label">🚨 막힘</span>
+        <span id="boss-stuck" class="boss-summary-value stuck">0</span>
+      </div>
+    </div>
+    <div id="team-grid" class="team-grid"></div>
+  </div>
+</div>
+
+<!-- Modal: Quest Detail (Hero) -->
+<div id="modal-quest" class="modal-backdrop" onclick="if(event.target===this)closeModal('modal-quest')">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-quest-title" class="modal-title">퀘스트 상세</h3>
+      <button class="modal-close" onclick="closeModal('modal-quest')">×</button>
+    </div>
+    <div class="modal-body">
+      <label class="field-label" style="font-size:13px;color:var(--neutral-400);display:block;margin-bottom:8px;">진행률</label>
+      <div class="progress-options">
+        <button class="progress-opt" onclick="setProgress(0)">0%</button>
+        <button class="progress-opt" onclick="setProgress(25)">25%</button>
+        <button class="progress-opt" onclick="setProgress(50)">50%</button>
+        <button class="progress-opt" onclick="setProgress(75)">75%</button>
+        <button class="progress-opt" onclick="setProgress(100)">100%</button>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="modal-stuck">
+        <label for="modal-stuck">🚨 함정에 빠졌어요 (막힘)</label>
+      </div>
+      <label class="field-label" style="font-size:13px;color:var(--neutral-400);display:block;margin-bottom:8px;">보고 메모</label>
+      <textarea id="modal-memo" placeholder="팀장님께 공유할 간단한 메모를 적어주세요"></textarea>
+    </div>
+    <button class="btn-primary" onclick="saveQuest()" style="font-size:13px;padding:14px;">저장하기</button>
+  </div>
+</div>
+
+<!-- Modal: Team Member Detail (Boss) -->
+<div id="modal-team" class="modal-backdrop" onclick="if(event.target===this)closeModal('modal-team')">
+  <div class="modal wide">
+    <div class="modal-header">
+      <h3 id="modal-team-title" class="modal-title">팀원 상세</h3>
+      <button class="modal-close" onclick="closeModal('modal-team')">×</button>
+    </div>
+    <div id="modal-team-body" class="modal-body">
+      <div class="team-quest-list"></div>
+    </div>
+    <p style="font-size:12px;color:var(--neutral-400);text-align:center;">※ 보스는 읽기 전용입니다 (팀원이 자발적으로 공유한 내용만 표시됩니다)</p>
+  </div>
+</div>
+
+<script>
+// ========== STATE ==========
+const STORAGE_KEY = 'toward_clockout_v2';
+
+const CLASS_INFO = {
+  mage: { name: '마법사', job: '개발자', icon: '🧙' },
+  warrior: { name: '전사', job: '영업직', icon: '⚔️' },
+  strategist: { name: '전략가', job: '기획팀', icon: '🎯' }
+};
+
+const defaultState = {
+  hasVisited: false,
+  heroClass: 'strategist',
+  heroQuests: [
+    { id: 1, name: '클라이언트 제안서 초안 작성', difficulty: 4, type: 'boss', due: 'D-2', challenge: '대표님 리뷰 대기', progress: 50, stuck: true, memo: '대표님 피드백 대기중이에요' },
+    { id: 2, name: '인스타그램 광고 소재 제작', difficulty: 3, type: 'main', due: 'D-Day', challenge: '', progress: 100, stuck: false, memo: '' },
+    { id: 3, name: '경쟁사 리서치 정리', difficulty: 2, type: 'sub', due: 'D-3', challenge: '', progress: 25, stuck: false, memo: '' }
+  ],
+  teamMembers: [
+    { id: 'self', name: '김민지 (나)', role: '마케팅 대리', isSelf: true },
+    { id: 'm1', name: '이과장', role: '마케팅 과장', quests: [
+      { name: '상반기 기획안 작성', type: 'boss', progress: 25, stuck: true, memo: '대표님 피드백 대기' },
+      { name: '팀 회의록 정리', type: 'main', progress: 100, stuck: false, memo: '' },
+      { name: '벤치마킹 자료 수집', type: 'sub', progress: 50, stuck: false, memo: '' }
+    ]},
+    { id: 'm2', name: '박주임', role: '마케팅 주임', quests: [
+      { name: '이메일 캠페인 세팅', type: 'main', progress: 75, stuck: false, memo: '' },
+      { name: '구독자 리스트 정리', type: 'daily', progress: 100, stuck: false, memo: '' }
+    ]},
+    { id: 'm3', name: '최사원', role: '마케팅 사원', quests: [
+      { name: '블로그 포스트 카피', type: 'main', progress: 100, stuck: false, memo: '' },
+      { name: 'SNS 운영 데일리', type: 'daily', progress: 100, stuck: false, memo: '' }
+    ]},
+    { id: 'm4', name: '정주임', role: '마케팅 주임', quests: [
+      { name: '브랜드 영상 편집', type: 'boss', progress: 10, stuck: true, memo: '소스 파일 받기 대기' },
+      { name: '유튜브 썸네일 2종', type: 'sub', progress: 30, stuck: false, memo: '' }
+    ]},
+    { id: 'm5', name: '한대리', role: '마케팅 대리', quests: [
+      { name: '주간 지표 분석 리포트', type: 'main', progress: 60, stuck: false, memo: '' },
+      { name: '팀 주간 미팅 자료', type: 'sub', progress: 80, stuck: false, memo: '' }
+    ]}
+  ]
+};
+
+let state = loadState();
+let currentEditingQuestId = null;
+let currentProgress = 0;
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(defaultState));
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function resetDemo() {
+  if (!confirm('데모를 초기화할까요? 모든 데이터가 지워집니다.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = JSON.parse(JSON.stringify(defaultState));
+  showScreen('mode');
+}
+
+// ========== NAVIGATION ==========
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function selectMode(mode) {
+  if (mode === 'hero') {
+    if (state.hasVisited) {
+      renderQuestGrid();
+      showScreen('quest');
+    } else {
+      renderQuestInputs();
+      showScreen('create');
+    }
+  } else {
+    renderTeamGrid();
+    showScreen('boss');
+  }
+}
+
+function goToMode() {
+  showScreen('mode');
+}
+
+// ========== S2: Character Creation ==========
+let tempQuests = [];
+
+function selectClass(cls) {
+  state.heroClass = cls;
+  saveState();
+  document.querySelectorAll('.class-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.class === cls);
+  });
+  updateSummonButton();
+}
+
+function renderQuestInputs() {
+  tempQuests = state.heroQuests.map(q => ({ ...q }));
+  const container = document.getElementById('quest-inputs');
+  container.innerHTML = '';
+  tempQuests.forEach((q, idx) => {
+    container.appendChild(createQuestInputCard(q, idx));
+  });
+  // Reflect selected class in UI
+  document.querySelectorAll('.class-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.class === state.heroClass);
+  });
+  updateSummonButton();
+}
+
+function createQuestInputCard(q, idx) {
+  const div = document.createElement('div');
+  div.className = 'quest-input-card';
+  div.innerHTML = `
+    <div class="quest-input-header">
+      <span class="quest-input-label">퀘스트 #${idx + 1}</span>
+      <button class="btn-remove" onclick="removeQuest(${idx})">✕</button>
+    </div>
+    <div class="field">
+      <label>퀘스트명</label>
+      <input type="text" value="${q.name || ''}" placeholder="예: 제안서 작성" oninput="updateQuestField(${idx}, 'name', this.value)">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>난이도 (1~5)</label>
+        <select onchange="updateQuestField(${idx}, 'difficulty', parseInt(this.value))">
+          ${[1,2,3,4,5].map(n => `<option value="${n}" ${q.difficulty===n?'selected':''}>${'⭐'.repeat(n)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>타입</label>
+        <select onchange="updateQuestField(${idx}, 'type', this.value)">
+          <option value="main" ${q.type==='main'?'selected':''}>메인</option>
+          <option value="sub" ${q.type==='sub'?'selected':''}>서브</option>
+          <option value="boss" ${q.type==='boss'?'selected':''}>보스전</option>
+          <option value="daily" ${q.type==='daily'?'selected':''}>일일반복</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>제한 시간</label>
+        <input type="text" value="${q.due || ''}" placeholder="예: D-2" oninput="updateQuestField(${idx}, 'due', this.value)">
+      </div>
+      <div class="field">
+        <label>챌린지 (선택)</label>
+        <input type="text" value="${q.challenge || ''}" placeholder="예: 대표님 리뷰" oninput="updateQuestField(${idx}, 'challenge', this.value)">
+      </div>
+    </div>
+  `;
+  return div;
+}
+
+function updateQuestField(idx, field, value) {
+  tempQuests[idx][field] = value;
+  updateSummonButton();
+}
+
+function addQuestInput() {
+  tempQuests.push({ id: Date.now(), name: '', difficulty: 3, type: 'main', due: '', challenge: '', progress: 0, stuck: false, memo: '' });
+  renderTempQuestInputs();
+}
+
+function removeQuest(idx) {
+  tempQuests.splice(idx, 1);
+  renderTempQuestInputs();
+}
+
+function renderTempQuestInputs() {
+  const container = document.getElementById('quest-inputs');
+  container.innerHTML = '';
+  tempQuests.forEach((q, idx) => container.appendChild(createQuestInputCard(q, idx)));
+  updateSummonButton();
+}
+
+function updateSummonButton() {
+  const btn = document.getElementById('btn-summon');
+  const valid = tempQuests.filter(q => q.name && q.name.trim()).length > 0;
+  btn.disabled = !valid;
+}
+
+function summon() {
+  state.heroQuests = tempQuests.filter(q => q.name && q.name.trim());
+  state.hasVisited = true;
+  saveState();
+  showScreen('opening');
+  // Auto-navigate after 8 seconds
+  setTimeout(() => {
+    if (document.getElementById('screen-opening').classList.contains('active')) {
+      skipOpening();
+    }
+  }, 8500);
+}
+
+// ========== S3: Opening ==========
+function skipOpening() {
+  renderQuestGrid();
+  showScreen('quest');
+}
+
+// Keyboard shortcut
+document.addEventListener('keydown', (e) => {
+  if (document.getElementById('screen-opening').classList.contains('active')) {
+    if (e.key === 'Escape' || e.key === ' ') {
+      e.preventDefault();
+      skipOpening();
+    }
+  }
+});
+
+// ========== S4: Quest Main ==========
+function renderQuestGrid() {
+  const grid = document.getElementById('quest-grid');
+  grid.innerHTML = '';
+  state.heroQuests.forEach(q => grid.appendChild(createQuestCard(q)));
+  updateQuestSummary();
+  // Update class badge in header
+  const badge = document.getElementById('hero-class-badge');
+  if (badge && state.heroClass && CLASS_INFO[state.heroClass]) {
+    const info = CLASS_INFO[state.heroClass];
+    badge.innerHTML = `${info.icon} ${info.name} · ${info.job}`;
+  }
+  // Empty state handling
+  renderEmptyStateIfNeeded();
+}
+
+function renderEmptyStateIfNeeded() {
+  const active = state.heroQuests.filter(q => q.progress < 100);
+  const allDone = state.heroQuests.length > 0 && active.length === 0;
+  const empty = state.heroQuests.length === 0;
+  const grid = document.getElementById('quest-grid');
+  const existing = document.getElementById('empty-clockout-zone');
+  if (existing) existing.remove();
+  if (allDone || empty) {
+    const zone = document.createElement('div');
+    zone.id = 'empty-clockout-zone';
+    zone.className = 'empty-clockout-zone';
+    zone.innerHTML = `
+      <div class="empty-title">${allDone ? '🎉 오늘의 모든 퀘스트를 클리어했어요!' : '오늘의 퀘스트가 없네요'}</div>
+      <div class="empty-sub">${allDone ? '이제 당당하게 퇴근 버튼을 난타해주세요' : '그래도 퇴근 버튼은 누를 수 있어요'}</div>
+      <button id="mash-btn" class="mash-btn" onclick="mashClockOut()">🚪 퇴근하기</button>
+      <div class="mash-counter">난타 횟수: <span id="mash-count">0</span>회</div>
+    `;
+    grid.parentNode.insertBefore(zone, grid.nextSibling);
+  }
+}
+
+let mashCount = 0;
+const mashMessages = [
+  '오늘도 정말 수고하셨어요!',
+  '퇴근이에요 퇴근!',
+  '고생 많으셨습니다!',
+  '내일은 더 가벼운 퀘스트로 만나요',
+  '조심히 들어가세요!',
+  '맥주 한 잔 어떠세요?',
+  '벌써 이렇게나 눌렀네요!',
+  '퇴근의 기쁨을 아는 용사여',
+  '이쯤이면 정말 퇴근해도 돼요',
+  '진짜로요. 정말 퇴근하세요.'
+];
+function mashClockOut() {
+  mashCount++;
+  const el = document.getElementById('mash-count');
+  if (el) el.textContent = mashCount;
+  const btn = document.getElementById('mash-btn');
+  if (btn) {
+    btn.style.transform = `scale(${1 + (mashCount % 5) * 0.03}) rotate(${(mashCount % 2 === 0 ? -1 : 1) * 2}deg)`;
+    setTimeout(() => { if (btn) btn.style.transform = ''; }, 150);
+  }
+  if (mashCount % 3 === 0) {
+    const msg = mashMessages[Math.floor(Math.random() * mashMessages.length)];
+    showToast(msg);
+  }
+  if (mashCount >= 10) {
+    setTimeout(() => {
+      showToast('🏆 퇴근 마스터 달성! 오늘의 여정이 끝났어요.');
+      setTimeout(() => { showScreen('mode'); mashCount = 0; }, 1800);
+    }, 300);
+  }
+}
+
+function createQuestCard(q) {
+  const div = document.createElement('div');
+  div.className = 'quest-card';
+  if (q.stuck) div.classList.add('stuck');
+  if (q.progress >= 100) div.classList.add('clear');
+  div.onclick = () => openQuestModal(q.id);
+  const typeLabels = { main: '메인', sub: '서브', boss: '보스전', daily: '일일' };
+  div.innerHTML = `
+    <span class="quest-type-badge ${q.type}">${typeLabels[q.type]}</span>
+    <h3 class="quest-name">${escapeHtml(q.name)}${q.stuck ? '<span class="stuck-badge">막힘</span>' : ''}</h3>
+    <div class="quest-difficulty">${'⭐'.repeat(q.difficulty)}</div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:${q.progress}%"></div>
+    </div>
+    <div class="quest-meta">
+      <span>${q.due || ''}</span>
+      <span class="mono">${q.progress}%</span>
+    </div>
+    ${q.challenge ? `<div style="font-size:11px;color:var(--neutral-400);margin-top:8px;">💭 ${escapeHtml(q.challenge)}</div>` : ''}
+  `;
+  return div;
+}
+
+function updateQuestSummary() {
+  const total = state.heroQuests.length;
+  const done = state.heroQuests.filter(q => q.progress >= 100).length;
+  const stuck = state.heroQuests.filter(q => q.stuck && q.progress < 100).length;
+  const progress = total - done - stuck;
+  document.getElementById('summary-total').textContent = total;
+  document.getElementById('summary-done').textContent = done;
+  document.getElementById('summary-progress').textContent = progress;
+  document.getElementById('summary-stuck').textContent = stuck;
+  // Auto clockout
+  if (total > 0 && done === total) {
+    setTimeout(() => {
+      showToast('🎉 오늘의 모든 퀘스트 클리어! 이제 퇴근하실 수 있어요.');
+    }, 500);
+  }
+}
+
+// ========== Quest Modal ==========
+function openQuestModal(id) {
+  const quest = state.heroQuests.find(q => q.id === id);
+  if (!quest) return;
+  currentEditingQuestId = id;
+  currentProgress = quest.progress;
+  document.getElementById('modal-quest-title').textContent = quest.name;
+  document.getElementById('modal-stuck').checked = quest.stuck;
+  document.getElementById('modal-memo').value = quest.memo || '';
+  updateProgressOptions();
+  document.getElementById('modal-quest').classList.add('active');
+}
+
+function updateProgressOptions() {
+  document.querySelectorAll('.progress-opt').forEach(btn => {
+    const val = parseInt(btn.textContent);
+    btn.classList.toggle('selected', val === currentProgress);
+  });
+}
+
+function setProgress(value) {
+  currentProgress = value;
+  updateProgressOptions();
+}
+
+function saveQuest() {
+  const quest = state.heroQuests.find(q => q.id === currentEditingQuestId);
+  if (!quest) return;
+  quest.progress = currentProgress;
+  quest.stuck = document.getElementById('modal-stuck').checked;
+  quest.memo = document.getElementById('modal-memo').value;
+  saveState();
+  renderQuestGrid();
+  closeModal('modal-quest');
+  showToast('✓ 저장했어요');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// ========== Clockout ==========
+function clockOut() {
+  if (!confirm('조기 퇴근하시겠어요? 오늘의 기록이 남습니다.')) return;
+  showToast('🚪 오늘도 고생하셨어요! 퇴근 완료');
+  setTimeout(() => { showScreen('mode'); }, 1500);
+}
+
+// ========== S5: Boss Dashboard ==========
+function renderTeamGrid() {
+  // Build self card from hero quests
+  const selfMember = state.teamMembers.find(m => m.isSelf);
+  selfMember.quests = state.heroQuests.map(q => ({
+    name: q.name, type: q.type, progress: q.progress, stuck: q.stuck, memo: q.memo
+  }));
+  // Sort: stuck first, then progress
+  const sorted = [...state.teamMembers].sort((a, b) => {
+    const aStuck = a.quests.some(q => q.stuck);
+    const bStuck = b.quests.some(q => q.stuck);
+    if (aStuck !== bStuck) return bStuck - aStuck;
+    if (a.isSelf) return -1;
+    if (b.isSelf) return 1;
+    return 0;
+  });
+  const grid = document.getElementById('team-grid');
+  grid.innerHTML = '';
+  sorted.forEach(m => grid.appendChild(createTeamCard(m)));
+  updateBossSummary();
+}
+
+function createTeamCard(member) {
+  const div = document.createElement('div');
+  div.className = 'team-card';
+  if (member.isSelf) div.classList.add('self');
+  const hasStuck = member.quests && member.quests.some(q => q.stuck);
+  if (hasStuck) div.classList.add('stuck');
+  div.onclick = () => openTeamModal(member.id);
+
+  const total = member.quests.length;
+  const done = member.quests.filter(q => q.progress >= 100).length;
+  const avgProgress = total ? Math.round(member.quests.reduce((s, q) => s + q.progress, 0) / total) : 0;
+  const mainQuest = member.quests.find(q => q.type === 'boss') || member.quests.find(q => q.type === 'main') || member.quests[0];
+
+  div.innerHTML = `
+    <div class="team-name">${escapeHtml(member.name)}</div>
+    <div class="team-role">${escapeHtml(member.role)}</div>
+    <div class="team-quest-preview">${mainQuest ? '🎯 ' + escapeHtml(mainQuest.name) : '퀘스트 없음'}</div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:${avgProgress}%"></div>
+    </div>
+    <div class="quest-meta">
+      <span>${done}/${total} 완료</span>
+      <span class="mono">${avgProgress}%</span>
+    </div>
+    ${hasStuck ? '<div class="team-stuck-badge">🚨 막힘 발생</div>' : ''}
+  `;
+  return div;
+}
+
+function updateBossSummary() {
+  let total = 0, done = 0, stuck = 0;
+  state.teamMembers.forEach(m => {
+    if (!m.quests) return;
+    m.quests.forEach(q => {
+      total++;
+      if (q.progress >= 100) done++;
+      if (q.stuck && q.progress < 100) stuck++;
+    });
+  });
+  document.getElementById('boss-total').textContent = total;
+  document.getElementById('boss-done').textContent = done;
+  document.getElementById('boss-progress').textContent = total - done - stuck;
+  document.getElementById('boss-stuck').textContent = stuck;
+}
+
+function openTeamModal(id) {
+  const member = state.teamMembers.find(m => m.id === id);
+  if (!member) return;
+  document.getElementById('modal-team-title').textContent = `${member.name}의 전장`;
+  const body = document.getElementById('modal-team-body');
+  const typeLabels = { main: '메인', sub: '서브', boss: '보스전', daily: '일일' };
+  body.innerHTML = '<div class="team-quest-list">' +
+    member.quests.map(q => `
+      <div class="team-quest-item ${q.stuck ? 'stuck' : ''}">
+        <div>
+          <div style="font-weight:700">${escapeHtml(q.name)}</div>
+          <div style="font-size:11px;color:var(--neutral-400);margin-top:4px;">
+            [${typeLabels[q.type]}] ${q.progress >= 100 ? '✓ 클리어' : q.progress + '%'}${q.stuck ? ' · 🚨 막힘' : ''}
+          </div>
+          ${q.memo ? `<div style="font-size:11px;color:var(--neutral-100);margin-top:6px;font-style:italic;">"${escapeHtml(q.memo)}"</div>` : ''}
+        </div>
+      </div>
+    `).join('') + '</div>';
+  document.getElementById('modal-team').classList.add('active');
+}
+
+// ========== Utils ==========
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ========== Init ==========
+// Note: 처음 방문 시 hasVisited=false 유지 → 용사모드 클릭 시 S2(캐릭터 생성)로 진입.
+// 사용자가 '소환하기' 누르면 그제서야 hasVisited=true로 전환되어 다음엔 바로 S4로.
+</script>
+</body>
+</html>
