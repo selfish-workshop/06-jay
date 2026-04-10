@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>퇴근을 향하여 — 오늘의 용사를 소환하세요</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Black+Han+Sans&family=Jua&family=Gugi&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 :root {
   --primary: #1A1B3A;
@@ -21,14 +21,17 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Jua', 'Press Start 2P', sans-serif;
   background: linear-gradient(135deg, #0F0F2E 0%, #1A1B3A 100%);
   color: var(--neutral-100);
   min-height: 100vh;
   overflow-x: hidden;
+  letter-spacing: 0.02em;
 }
 
 .pixel { font-family: 'Press Start 2P', monospace; }
+.rpg-title { font-family: 'Black Han Sans', 'Jua', sans-serif; letter-spacing: 0.04em; }
+.rpg-script { font-family: 'Gugi', 'Jua', sans-serif; }
 .mono { font-family: 'JetBrains Mono', monospace; }
 
 .screen { display: none; min-height: 100vh; padding: 24px; }
@@ -44,7 +47,7 @@ body {
   border-bottom: 2px solid var(--bg-card);
   margin: -24px -24px 32px -24px;
 }
-.header-title { font-size: 14px; font-family: 'Press Start 2P', monospace; }
+.header-title { font-size: 18px; font-family: 'Black Han Sans', sans-serif; letter-spacing: 0.05em; }
 .header-title.hero { color: var(--accent-hero); }
 .header-title.boss { color: var(--accent-boss); }
 .header-actions { display: flex; gap: 12px; }
@@ -73,17 +76,19 @@ body {
 #screen-mode.active { display: flex; }
 
 .mode-title {
-  font-size: 32px;
+  font-size: 56px;
   color: var(--accent-hero);
-  margin-bottom: 8px;
-  font-family: 'Press Start 2P', monospace;
+  margin-bottom: 12px;
+  font-family: 'Black Han Sans', sans-serif;
   text-align: center;
-  text-shadow: 0 0 20px rgba(245, 197, 24, 0.3);
+  text-shadow: 0 0 30px rgba(245, 197, 24, 0.4), 4px 4px 0 rgba(0,0,0,0.4);
+  letter-spacing: 0.08em;
 }
 .mode-subtitle {
-  font-size: 16px;
+  font-size: 18px;
   color: var(--neutral-400);
   margin-bottom: 60px;
+  font-family: 'Jua', sans-serif;
 }
 .mode-cards { display: flex; gap: 48px; flex-wrap: wrap; justify-content: center; }
 .mode-card {
@@ -111,28 +116,33 @@ body {
 }
 .mode-icon { font-size: 72px; margin-bottom: 24px; }
 .mode-name {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 28px;
+  font-family: 'Black Han Sans', sans-serif;
+  letter-spacing: 0.06em;
   margin-bottom: 6px;
 }
 .mode-name.hero { color: var(--accent-hero); }
 .mode-name.boss { color: var(--accent-boss); }
-.mode-label { font-size: 12px; color: var(--neutral-400); margin-bottom: 20px; font-family: 'Press Start 2P', monospace; }
-.mode-desc { font-size: 13px; color: var(--neutral-100); text-align: center; line-height: 1.6; }
+.mode-label { font-size: 11px; color: var(--neutral-400); margin-bottom: 20px; font-family: 'Press Start 2P', monospace; }
+.mode-desc { font-size: 15px; color: var(--neutral-100); text-align: center; line-height: 1.7; font-family: 'Jua', sans-serif; }
 
 /* === S2: Character (Task Input) === */
 #screen-create .container { max-width: 680px; margin: 0 auto; }
 .create-title {
-  font-size: 24px;
+  font-size: 36px;
   color: var(--accent-hero);
   margin-bottom: 8px;
   text-align: center;
+  font-family: 'Black Han Sans', sans-serif;
+  letter-spacing: 0.05em;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
 }
 .create-subtitle {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--neutral-400);
   text-align: center;
   margin-bottom: 32px;
+  font-family: 'Jua', sans-serif;
 }
 .quest-inputs { display: flex; flex-direction: column; gap: 16px; }
 .quest-input-card {
@@ -148,7 +158,7 @@ body {
   align-items: center;
   margin-bottom: 12px;
 }
-.quest-input-label { font-size: 12px; color: var(--neutral-400); font-family: 'Press Start 2P', monospace; }
+.quest-input-label { font-size: 16px; color: var(--accent-hero); font-family: 'Black Han Sans', sans-serif; letter-spacing: 0.04em; }
 .btn-remove {
   background: transparent;
   border: none;
@@ -194,15 +204,16 @@ body {
   background: var(--accent-hero);
   color: var(--primary);
   border: none;
-  padding: 16px 32px;
+  padding: 18px 32px;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: 700;
-  font-size: 16px;
+  font-size: 22px;
   width: 100%;
   margin-top: 24px;
-  font-family: 'Press Start 2P', monospace;
+  font-family: 'Black Han Sans', sans-serif;
+  letter-spacing: 0.08em;
   transition: all 0.2s;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
 }
 .btn-primary:disabled { background: var(--neutral-400); cursor: not-allowed; }
 .btn-primary:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 197, 24, 0.4); }
@@ -236,17 +247,18 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
-  max-width: 600px;
+  max-width: 700px;
   text-align: center;
   color: white;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 22px;
-  line-height: 2.4;
+  font-family: 'Gugi', 'Black Han Sans', sans-serif;
+  font-size: 32px;
+  line-height: 2.2;
+  letter-spacing: 0.05em;
   bottom: -100%;
   animation: creditScroll 8s linear forwards;
 }
 .opening-text p { margin-bottom: 32px; }
-.opening-text .highlight { color: var(--accent-hero); font-size: 32px; }
+.opening-text .highlight { color: var(--accent-hero); font-size: 56px; font-family: 'Black Han Sans', sans-serif; text-shadow: 0 0 20px rgba(245,197,24,0.6); }
 @keyframes creditScroll {
   from { bottom: -100%; }
   to { bottom: 120%; }
@@ -301,10 +313,11 @@ body {
 }
 .quest-type-badge {
   display: inline-block;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 12px;
-  font-size: 10px;
-  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  font-family: 'Black Han Sans', sans-serif;
+  letter-spacing: 0.05em;
   margin-bottom: 12px;
 }
 .quest-type-badge.main { background: var(--accent-hero); color: var(--primary); }
@@ -312,8 +325,9 @@ body {
 .quest-type-badge.boss { background: var(--warning); color: white; }
 .quest-type-badge.daily { background: #3B82F6; color: white; }
 .quest-name {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 20px;
+  font-family: 'Black Han Sans', sans-serif;
+  letter-spacing: 0.02em;
   margin-bottom: 8px;
   color: var(--neutral-100);
 }
@@ -360,8 +374,9 @@ body {
   padding: 14px 32px;
   border-radius: 8px;
   cursor: pointer;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 14px;
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.06em;
   transition: all 0.2s;
 }
 .btn-clockout:hover { background: var(--accent-hero); color: var(--primary); }
@@ -414,9 +429,9 @@ body {
   font-size: 11px;
   font-weight: 700;
 }
-.team-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-.team-role { font-size: 12px; color: var(--neutral-400); margin-bottom: 16px; }
-.team-quest-preview { font-size: 13px; color: var(--neutral-100); margin-bottom: 12px; }
+.team-name { font-size: 22px; font-family: 'Black Han Sans', sans-serif; letter-spacing: 0.04em; margin-bottom: 4px; }
+.team-role { font-size: 13px; color: var(--neutral-400); margin-bottom: 16px; font-family: 'Jua', sans-serif; }
+.team-quest-preview { font-size: 15px; color: var(--neutral-100); margin-bottom: 12px; font-family: 'Jua', sans-serif; }
 .team-stuck-badge {
   display: inline-block;
   background: var(--warning);
@@ -467,7 +482,7 @@ body {
   align-items: center;
   margin-bottom: 20px;
 }
-.modal-title { font-size: 18px; font-weight: 700; color: var(--accent-hero); }
+.modal-title { font-size: 24px; font-family: 'Black Han Sans', sans-serif; letter-spacing: 0.04em; color: var(--accent-hero); }
 .modal-close {
   background: transparent;
   border: none;
