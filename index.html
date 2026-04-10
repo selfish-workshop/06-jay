@@ -858,7 +858,7 @@ textarea {
 
 <script>
 // ========== STATE ==========
-const STORAGE_KEY = 'toward_clockout_v1';
+const STORAGE_KEY = 'toward_clockout_v2';
 
 const CLASS_INFO = {
   mage: { name: '마법사', job: '개발자', icon: '🧙' },
@@ -1339,11 +1339,8 @@ function showToast(msg) {
 }
 
 // ========== Init ==========
-// Pre-populate demo state if fresh
-if (!state.hasVisited) {
-  state.hasVisited = true;
-  saveState();
-}
+// Note: 처음 방문 시 hasVisited=false 유지 → 용사모드 클릭 시 S2(캐릭터 생성)로 진입.
+// 사용자가 '소환하기' 누르면 그제서야 hasVisited=true로 전환되어 다음엔 바로 S4로.
 </script>
 </body>
 </html>
